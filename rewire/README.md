@@ -12,8 +12,7 @@ It adds two transforms from the spine's transform-id table (`spec/LAYERS.md`):
 `gfa.allowable` is the one canonical allowable-GFA transform; TWA GFAAgent should point here.
 
 ```bash
-pip install 'git+https://github.com/tetratorus/sg-urban-spine@main'
-pip install geopandas shapely pyproj 'pyarrow>=14,<17' contextily rtree mapclassify  # + upstream deps from environment.yml
+pip install -r rewire/requirements.txt   # sg-urban-spine@main + pinned upstream deps (python 3.11)
 cd rewire
 spine --path . validate */transform.yaml
 spine --path . test                      # golden: both transforms
