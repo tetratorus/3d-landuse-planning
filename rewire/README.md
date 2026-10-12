@@ -49,7 +49,7 @@ End to end through a spine lake (Bronze → conformer → transform → WAP audi
 ```bash
 C=ura.mp2019_conform/golden/sg_44_plots/inputs
 spine --lake LAKE bronze-add --url https://doi.org/10.5281/zenodo.14646814 --license CC-BY-4.0 ura_mp2019_kg sg44-v1 $C/kg/*
-spine --lake LAKE bronze-add --url https://doi.org/10.5281/zenodo.14647555 --license "Singapore Open Data Licence v1.0" lta_road_network sg44-v1 $C/roads/*
+spine --lake LAKE bronze-add --url https://doi.org/10.5281/zenodo.14647555 --license "CC-BY-4.0 (Zenodo redistribution of LTA data, Singapore Open Data Licence v1.0)" lta_road_network sg44-v1 $C/roads/*
 spine --lake LAKE --path . run ura.mp2019_conform
 spine --lake LAKE --path . run gfa.allowable
 ```
