@@ -12,7 +12,9 @@ It adds two transforms from the spine's transform-id table (`spec/LAYERS.md`):
 `gfa.allowable` is the one canonical allowable-GFA transform; TWA GFAAgent should point here.
 
 ```bash
-pip install -r rewire/requirements.txt   # sg-urban-spine@main + pinned upstream deps (python 3.11)
+pip install -r rewire/requirements.txt   # sg-urban-spine@main + pinned upstream deps (python 3.10 / 3.11)
+# if github.com/tetratorus/sg-urban-spine is not readable for you, the same commit is at
+# git+https://github.com/tetratorus/saas-middleware@sg-urban-spine
 cd rewire
 spine --path . validate */transform.yaml
 spine --path . test                      # golden: both transforms
@@ -72,6 +74,12 @@ spine --lake LAKE --path . run gfa.allowable
 * `id_bridge` rows: `twa_citieskg_plot` (KG CityObject IRI → plot, every plot) and
   `ura_mp2019_inc_crc` (INC_CRC → primary plot), `lta_road_network` (`UNIQUE_ID` → `lta-rd-<UNIQUE_ID>`).
 * Upstream neighbour sets are stored as hub ids in `plots.neighbour` and mapped back to IRIs by the transform.
+
+`id_bridge` is shared by every source and `silver_write` replaces whole tables, so the conformer takes
+an optional `bronze:spine_hub_snapshot` input (`hubs/id_bridge.parquet`, a copy of current Silver) and
+re-emits every row whose `source` is not one of its own (`twa_citieskg_plot`, `ura_mp2019_inc_crc`,
+`lta_road_network`); its own rows are rebuilt from Bronze. Golden case `sg_44_plots_shared_bridge`
+covers this (one foreign row kept, one stale own row replaced).
 
 ## Silver mapping and the schema gap
 

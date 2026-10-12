@@ -1,15 +1,15 @@
-# Verified set for rewire/ (python 3.11). Upstream code predates pandas 3 / numpy 2 / geopandas 1.x, so pin.
+# Verified set for rewire/ (python 3.10 and 3.11). Upstream code predates pandas 3 / numpy 2 / geopandas 1.x, so pin.
 sg-urban-spine @ git+https://github.com/tetratorus/sg-urban-spine@main
 geopandas==0.14.4
 pandas==2.2.3
 numpy==1.26.4
 shapely==2.0.7
-pyproj==3.7.2
+pyproj>=3.6,<3.8
 pyarrow==16.1.0
-fiona==1.10.1
+fiona>=1.9,<1.11
 rdflib==6.3.2
 SPARQLWrapper==2.0.0
-contextily==1.7.1
-rtree==1.4.1
-mapclassify==2.10.0
+contextily>=1.6,<1.8
+rtree>=1.2,<1.5
+mapclassify>=2.6,<2.11
 pytest

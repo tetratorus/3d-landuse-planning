@@ -21,6 +21,7 @@ runtime:
 inputs:
   - {name: kg, source: "bronze:ura_mp2019_kg", description: "rewire/bronze/extract_kg.py export (one Parquet per upstream retriever + _schema.json)"}
   - {name: roads, source: "bronze:lta_road_network", description: "LTA road_network.shp (or GeoParquet) from the 3DLUP data submission"}
+  - {name: hubs, source: "bronze:spine_hub_snapshot", optional: true, description: "snapshot of current Silver id_bridge.parquet; rows from other sources are re-emitted unchanged (id_bridge is shared, silver_write replaces whole tables)"}
 outputs:
   - {name: plots}
   - {name: zoning}
@@ -30,6 +31,9 @@ outputs:
 golden:
   - name: sg_44_plots
     path: golden/sg_44_plots
+    tolerance: {rtol: 1.0e-9, atol: 1.0e-6}
+  - name: sg_44_plots_shared_bridge
+    path: golden/sg_44_plots_shared_bridge
     tolerance: {rtol: 1.0e-9, atol: 1.0e-6}
     reference: "self-consistency: Bronze -> Silver -> upstream frames round-trips to the exact retriever output of the unmodified upstream on 4 Singapore clusters (rewire/tests)"
 readiness:

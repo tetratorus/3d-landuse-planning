@@ -45,5 +45,18 @@ def run(inputs, params):
     silver = kg_codec.bronze_to_silver(kg_codec.read_bronze(kg_dir), kg_dir.name)
     roads, road_bridge = conform_roads(_read_roads(roads_dir), roads_dir.name)
     silver["roads"] = roads
-    silver["id_bridge"] = pd.concat([silver["id_bridge"], road_bridge], ignore_index=True)
+    own = pd.concat([silver["id_bridge"], road_bridge], ignore_index=True)
+    silver["id_bridge"] = pd.concat([_foreign_bridge(inputs.get("hubs")), own], ignore_index=True)
     return silver
+
+
+OWN_SOURCES = {kg_codec.IRI_SOURCE, kg_codec.MP19_SOURCE, ROAD_SOURCE}
+
+
+def _foreign_bridge(hubs_dir) -> pd.DataFrame:
+    """id_bridge is shared and silver_write replaces whole tables: re-emit other sources' rows from the snapshot."""
+    f = Path(hubs_dir) / "id_bridge.parquet" if hubs_dir is not None else None
+    if f is None or not f.exists():
+        return pd.DataFrame()
+    snap = pd.read_parquet(f)
+    return snap[~snap["source"].isin(OWN_SOURCES)].reset_index(drop=True)
