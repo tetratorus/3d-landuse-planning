@@ -1,0 +1,264 @@
+{
+ "get_development_control_plans": {
+  "columns": [
+   "reg",
+   "setback",
+   "site_coverage",
+   "programme",
+   "road_categories",
+   "gpr",
+   "storeys",
+   "storey_f",
+   "floor_height",
+   "gpr_f"
+  ],
+  "kinds": {
+   "reg": "object",
+   "setback": "float64",
+   "site_coverage": "float64",
+   "programme": "object",
+   "road_categories": "list",
+   "gpr": "float64",
+   "storeys": "float64",
+   "storey_f": "object",
+   "floor_height": "object",
+   "gpr_f": "object"
+  },
+  "rows": 113,
+  "crs": null
+ },
+ "get_street_block_plans": {
+  "columns": [
+   "reg",
+   "setback",
+   "level",
+   "setback_type",
+   "storeys",
+   "gpr",
+   "geometry"
+  ],
+  "kinds": {
+   "reg": "object",
+   "setback": "float64",
+   "level": "float64",
+   "setback_type": "object",
+   "storeys": "float64",
+   "gpr": "float64",
+   "geometry": "geometry"
+  },
+  "rows": 804,
+  "crs": "EPSG:3857"
+ },
+ "get_urban_design_guidelines": {
+  "columns": [
+   "reg",
+   "partywall",
+   "additional_type",
+   "storeys",
+   "storeys_f",
+   "setback",
+   "setback_f",
+   "geometry"
+  ],
+  "kinds": {
+   "reg": "object",
+   "partywall": "object",
+   "additional_type": "object",
+   "storeys": "float64",
+   "storeys_f": "object",
+   "setback": "float64",
+   "setback_f": "object",
+   "geometry": "geometry"
+  },
+  "rows": 378,
+  "crs": "EPSG:3857"
+ },
+ "get_landed_housing_areas": {
+  "columns": [
+   "reg",
+   "storeys"
+  ],
+  "kinds": {
+   "reg": "object",
+   "storeys": "int64"
+  },
+  "rows": 254,
+  "crs": null
+ },
+ "get_road_categories": {
+  "columns": [
+   "road_reg",
+   "category",
+   "buffer"
+  ],
+  "kinds": {
+   "road_reg": "object",
+   "category": "int64",
+   "buffer": "float64"
+  },
+  "rows": 30,
+  "crs": null
+ },
+ "get_height_control_plans": {
+  "columns": [
+   "reg",
+   "storeys",
+   "storeys_f",
+   "additional_type",
+   "abs_height",
+   "height_f",
+   "geometry"
+  ],
+  "kinds": {
+   "reg": "object",
+   "storeys": "float64",
+   "storeys_f": "object",
+   "additional_type": "object",
+   "abs_height": "float64",
+   "height_f": "object",
+   "geometry": "geometry"
+  },
+  "rows": 931,
+  "crs": "EPSG:3857"
+ },
+ "get_regulation_links": {
+  "columns": [
+   "reg",
+   "plots",
+   "reg_type"
+  ],
+  "kinds": {
+   "reg": "object",
+   "plots": "object",
+   "reg_type": "object"
+  },
+  "rows": 16159,
+  "crs": null
+ },
+ "get_plots": {
+  "columns": [
+   "plots",
+   "zone",
+   "gpr",
+   "geometry",
+   "plot_area"
+  ],
+  "kinds": {
+   "plots": "object",
+   "zone": "object",
+   "gpr": "float64",
+   "geometry": "geometry",
+   "plot_area": "float64"
+  },
+  "rows": 830,
+  "crs": "EPSG:3857"
+ },
+ "get_plot_properties": {
+  "columns": [
+   "plots",
+   "avg_width",
+   "avg_depth",
+   "corner_plot",
+   "fringe_plot",
+   "road_type",
+   "zone"
+  ],
+  "kinds": {
+   "plots": "object",
+   "avg_width": "float64",
+   "avg_depth": "float64",
+   "corner_plot": "object",
+   "fringe_plot": "object",
+   "road_type": "object",
+   "zone": "object"
+  },
+  "rows": 815,
+  "crs": null,
+  "adds": [
+   "avg_width",
+   "avg_depth",
+   "corner_plot",
+   "fringe_plot",
+   "road_type",
+   "zone"
+  ]
+ },
+ "get_neighbours": {
+  "columns": [
+   "plots",
+   "neighbour"
+  ],
+  "kinds": {
+   "plots": "object",
+   "neighbour": "set"
+  },
+  "rows": 815,
+  "crs": null,
+  "adds": [
+   "neighbour"
+  ]
+ },
+ "get_plot_neighbour_types": {
+  "columns": [
+   "plots",
+   "neighbour_road_type",
+   "neighbour_zones",
+   "abuts_gcba",
+   "in_central_area"
+  ],
+  "kinds": {
+   "plots": "object",
+   "neighbour_road_type": "list",
+   "neighbour_zones": "list",
+   "abuts_gcba": "int64",
+   "in_central_area": "int64"
+  },
+  "rows": 815,
+  "crs": null,
+  "adds": [
+   "neighbour_road_type",
+   "neighbour_zones",
+   "abuts_gcba",
+   "in_central_area"
+  ]
+ },
+ "get_plot_allowed_programmes": {
+  "columns": [
+   "plots",
+   "in_pb",
+   "sbp_programmes",
+   "in_lha",
+   "lha_programmes",
+   "in_gcba"
+  ],
+  "kinds": {
+   "plots": "object",
+   "in_pb": "list",
+   "sbp_programmes": "list",
+   "in_lha": "list",
+   "lha_programmes": "list",
+   "in_gcba": "int64"
+  },
+  "rows": 815,
+  "crs": null,
+  "adds": [
+   "in_pb",
+   "sbp_programmes",
+   "in_lha",
+   "lha_programmes",
+   "in_gcba"
+  ]
+ },
+ "inc_crc": {
+  "columns": [
+   "plots",
+   "inc_crc"
+  ],
+  "kinds": {
+   "plots": "object",
+   "inc_crc": "object"
+  },
+  "rows": 113672,
+  "crs": null
+ }
+}

@@ -1,0 +1,46 @@
+id: ura.mp2019_conform
+version: 0.1.0
+kind: conformer
+title: URA Master Plan 2019 + development control (3DLUP planning KG) + LTA roads -> silver plots, zoning, regulations, roads, id_bridge
+description: >
+  Bronze `ura_mp2019_kg` is a Parquet snapshot of exactly what 3D Land Use Planning's own SPARQL
+  retrievers (retrievers.py) return from its published planning KG (MP2019 plots, URA development
+  control / street block plans / urban design guidelines / landed housing areas / height control,
+  LTA road categories), captured by rewire/bronze/extract_kg.py. The conformer maps it onto Silver
+  losslessly (round-trip tested): hub plot_id = mp19-<INC_CRC lowercase>, KG CityObject IRIs and
+  INC_CRC go to id_bridge, and the regulations that apply to each plot are kept in the upstream
+  vocabulary as regulations.applicable_regulations_json (see rewire/README.md, schema gap).
+upstream:
+  repo: "https://github.com/tetratorus/3d-landuse-planning"
+  license: "MIT (code, see LICENSE); data: URA Master Plan 2019 + LTA road network under Singapore Open Data Licence v1.0, planning KG + intermediate inputs published on Zenodo under CC-BY-4.0 (doi:10.5281/zenodo.14646814, doi:10.5281/zenodo.14647555)"
+  commercial_use: allowed
+runtime:
+  type: python
+  entrypoint: "adapter:run"
+  pythonpath: [".."]
+inputs:
+  - {name: kg, source: "bronze:ura_mp2019_kg", description: "rewire/bronze/extract_kg.py export (one Parquet per upstream retriever + _schema.json)"}
+  - {name: roads, source: "bronze:lta_road_network", description: "LTA road_network.shp (or GeoParquet) from the 3DLUP data submission"}
+outputs:
+  - {name: plots}
+  - {name: zoning}
+  - {name: regulations}
+  - {name: roads}
+  - {name: id_bridge}
+golden:
+  - name: sg_44_plots
+    path: golden/sg_44_plots
+    tolerance: {rtol: 1.0e-9, atol: 1.0e-6}
+    reference: "self-consistency: Bronze -> Silver -> upstream frames round-trips to the exact retriever output of the unmodified upstream on 4 Singapore clusters (rewire/tests)"
+readiness:
+  level: 5
+  evidence:
+    - "ran on a KG snapshot of 1188 plots (44 target plots in Tanjong Pagar, Serangoon Gardens, Jurong East, a Street Block Plan area + 150 m context) taken from the full published KG loaded into Blazegraph on Linux"
+    - "Silver plots/zoning/regulations/roads/id_bridge pass spine Silver schema validation"
+    - "round trip Bronze -> Silver -> upstream retriever frames is exact for all 12 upstream retrievers (rewire/tests/test_roundtrip.py)"
+    - "gfa.allowable fed only from this Silver output reproduces the unmodified upstream GFA exactly"
+  gaps:
+    - "not yet run island-wide (full KG = 88k GFA plots; Bronze export of the whole island is a one-off ~1 h Blazegraph job)"
+    - "regulations.applicable_regulations_json is a lossless stopgap; a Silver many-to-many plot<->regulation link table does not exist yet"
+    - "a few MP2019 features are split into several KG CityObjects; the largest keeps mp19-<inc_crc>, slivers get -p2, -p3 suffixes"
+    - "roads conformed with LTA attributes only; no road-to-plot topology in Silver"

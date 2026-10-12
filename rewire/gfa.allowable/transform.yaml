@@ -1,0 +1,67 @@
+id: gfa.allowable
+version: 0.1.0
+kind: transform
+title: 3D Land Use Planning allowable GFA per plot (URA development control, unmodified upstream regulation logic)
+description: >
+  Canonical allowable-GFA transform (TWA GFAAgent points here). Runs the unmodified
+  main.estimate_allowable_gfas chain from 3D Land Use Planning (utils.py: GPR assignment, street block
+  plans, road buffers, party walls, UDG setbacks, buildable footprints, storeys, GFA) with only its I/O
+  rebound: retrievers are served from Silver, the N-Quad writer is captured. No Blazegraph needed.
+upstream:
+  repo: "https://github.com/tetratorus/3d-landuse-planning"
+  license: "MIT (code, see LICENSE); input data: Singapore Open Data Licence v1.0 (URA/LTA) and CC-BY-4.0 (Zenodo planning KG doi:10.5281/zenodo.14646814)"
+  commercial_use: allowed
+runtime:
+  type: python
+  entrypoint: "adapter:run"
+  pythonpath: [".."]
+inputs:
+  - {name: plots, source: "silver:plots"}
+  - {name: zoning, source: "silver:zoning"}
+  - {name: regulations, source: "silver:regulations"}
+  - {name: id_bridge, source: "silver:id_bridge"}
+parameters:
+  type: object
+  properties:
+    plot_ids:
+      type: array
+      items: {type: string}
+      description: "plots to compute (hub plot_id). Default: every plot in Silver. Context plots must still be present in Silver."
+    scenario:
+      type: boolean
+      default: false
+      description: "use upstream's [paths] scenario_dir (upstream 'scenario' run)"
+    seed:
+      type: integer
+      default: 0
+      description: "numpy seed; upstream samples a Street Block Plan GPR when a plot has several"
+outputs:
+  - name: allowable_gfa
+    key: [plot_id]
+    columns:
+      - {name: plot_id, type: string}
+      - {name: max_gfa_m2, type: float, unit: m2, description: "largest allowable GFA over the programmes upstream allows on the plot (null if none computable)"}
+      - {name: max_gfa_programme, type: string, description: "programme giving max_gfa_m2 (upstream OntoBuildableSpace programme name)"}
+      - {name: n_programmes, type: int}
+  - name: allowable_gfa_by_programme
+    key: [plot_id, programme]
+    columns:
+      - {name: plot_id, type: string}
+      - {name: programme, type: string, description: "upstream programme; 'unspecified' where upstream keys GFA by None"}
+      - {name: gfa_m2, type: float, unit: m2, description: "upstream gfa value (null where upstream emits NaN)"}
+golden:
+  - name: sg_44_plots
+    path: golden/sg_44_plots
+    tolerance: {rtol: 1.0e-9, atol: 1.0e-6}
+    reference: "unmodified upstream main.estimate_allowable_gfas on 44 plots (Tanjong Pagar, Serangoon Gardens, Jurong East, a Street Block Plan area); same values as the unmodified run against the full KG in Blazegraph; 106/115 equal to the published Zenodo GFA triples (9 Flat values differ, see rewire/README.md)"
+readiness:
+  level: 6
+  evidence:
+    - "golden: unmodified upstream science run on 44 Singapore plots from Silver; identical across PYTHONHASHSEED 0/1 and across Bronze-direct vs Silver inputs"
+    - "same 99 values as the unmodified upstream run against the full KG in Blazegraph (Linux) for the 36 shared plots"
+    - "cross-check vs upstream's published Zenodo output: 106/115 programme values exact"
+    - "runs on Linux without Blazegraph"
+  gaps:
+    - "9 Flat values differ from the published Zenodo output; upstream run-to-run variance against Blazegraph observed on the same programmes (likely SPARQL row order, unconfirmed)"
+    - "not run island-wide in this harness; full run ~10 min per 36 plots when the whole KG is in memory"
+    - "results must be computed with enough context plots (neighbours, roads) in Silver; README gives the 150 m ring rule used here"
