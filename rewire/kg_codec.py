@@ -181,12 +181,12 @@ def bronze_to_silver(b: dict[str, pd.DataFrame], version: str) -> dict[str, pd.D
                                 "source_version": version})
 
     bridge = pd.concat([
-        pd.DataFrame({"source": IRI_SOURCE, "source_id": base["plots"].values, "hub": "plots",
-                      "hub_id": pid.values, "match_method": "kg_inc_crc_attribute", "confidence": 1.0,
+        pd.DataFrame({"source": IRI_SOURCE, "source_id": base["plots"].values, "hub": "plot",
+                      "hub_id": pid.values, "match_method": "exact", "confidence": 1.0,
                       "source_version": version}),
         pd.DataFrame({"source": MP19_SOURCE, "source_id": base["plots"].map(
-                          dict(zip(crc["plots"], crc["inc_crc"]))).values, "hub": "plots",
-                      "hub_id": pid.values, "match_method": "exact_key", "confidence": 1.0,
+                          dict(zip(crc["plots"], crc["inc_crc"]))).values, "hub": "plot",
+                      "hub_id": pid.values, "match_method": "exact", "confidence": 1.0,
                       "source_version": version})[~pid.str.contains("-p", regex=False).values],
     ], ignore_index=True)
     return {"plots": plots, "zoning": zoning, "regulations": regulations, "id_bridge": bridge}
@@ -195,7 +195,7 @@ def bronze_to_silver(b: dict[str, pd.DataFrame], version: str) -> dict[str, pd.D
 def silver_to_frames(plots: gpd.GeoDataFrame, zoning: pd.DataFrame, regulations: pd.DataFrame,
                      id_bridge: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Rebuild every upstream retriever's return value from Silver (inverse of bronze_to_silver)."""
-    br = id_bridge[(id_bridge["source"] == IRI_SOURCE) & (id_bridge["hub"] == "plots")]
+    br = id_bridge[(id_bridge["source"] == IRI_SOURCE) & (id_bridge["hub"] == "plot")]
     id_to_iri = dict(zip(br["hub_id"], br["source_id"]))
     plots = plots.sort_values("kg_row") if "kg_row" in plots.columns else plots
     p = plots.merge(zoning, on="plot_id", how="left", suffixes=("", "_z"))

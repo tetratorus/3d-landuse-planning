@@ -14,6 +14,7 @@ REWIRE = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REWIRE))
 
 import kg_codec
+from spine.spec import silver_table
 from spine.validate import check_silver
 
 KG = REWIRE / "ura.mp2019_conform" / "golden" / "sg_44_plots" / "inputs" / "kg"
@@ -56,6 +57,13 @@ def test_hub_ids_from_inc_crc(roundtrip):
     assert pid.str.match(r"^mp19-[0-9a-f]{16}(-p\d+)?$").all()
     mp19 = silver["id_bridge"].query("source == @kg_codec.MP19_SOURCE")
     assert (("mp19-" + mp19["source_id"].str.lower()) == mp19["hub_id"]).all()
+
+
+def test_id_bridge_uses_documented_vocab(roundtrip):
+    _, silver, _ = roundtrip
+    cols = silver_table("id_bridge")["columns"]
+    assert set(silver["id_bridge"]["hub"]) <= {v.strip() for v in cols["hub"]["doc"].split("|")}
+    assert set(silver["id_bridge"]["match_method"]) <= {v.strip() for v in cols["match_method"]["doc"].split("|")}
 
 
 @pytest.mark.parametrize("name", ["get_plots", *kg_codec.ENRICHMENTS])

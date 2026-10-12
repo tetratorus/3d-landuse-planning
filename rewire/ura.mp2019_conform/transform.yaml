@@ -32,6 +32,7 @@ golden:
   - name: sg_44_plots
     path: golden/sg_44_plots
     tolerance: {rtol: 1.0e-9, atol: 1.0e-6}
+    reference: "self-consistency: Silver produced from the Bronze snapshot of the unmodified upstream retrievers (retrievers.py run against the published Zenodo KG, doi:10.5281/zenodo.14646814, in Blazegraph, via rewire/bronze/extract_kg.py) for 1188 plots around 44 Singapore target plots; Silver -> upstream frames round-trips exactly (rewire/tests/test_roundtrip.py)"
   - name: sg_44_plots_shared_bridge
     path: golden/sg_44_plots_shared_bridge
     tolerance: {rtol: 1.0e-9, atol: 1.0e-6}

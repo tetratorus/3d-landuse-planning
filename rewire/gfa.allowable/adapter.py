@@ -16,7 +16,7 @@ NO_PROGRAMME = "unspecified"
 
 
 def _iri_map(id_bridge: pd.DataFrame) -> pd.DataFrame:
-    b = id_bridge[(id_bridge["source"] == kg_codec.IRI_SOURCE) & (id_bridge["hub"] == "plots")]
+    b = id_bridge[(id_bridge["source"] == kg_codec.IRI_SOURCE) & (id_bridge["hub"] == "plot")]
     return b[["source_id", "hub_id"]].rename(columns={"source_id": "plots", "hub_id": "plot_id"})
 
 

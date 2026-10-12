@@ -1,7 +1,7 @@
 # rewire/ — 3D Land Use Planning on the sg-urban-spine
 
 This directory plugs 3D Land Use Planning (3DLUP) into
-[sg-urban-spine](https://github.com/tetratorus/sg-urban-spine) without changing its science.
+[sg-urban-spine](https://github.com/tetratorus/saas-middleware/tree/sg-urban-spine) without changing its science.
 It adds two transforms from the spine's transform-id table (`spec/LAYERS.md`):
 
 | id | kind | what it does |
@@ -12,9 +12,7 @@ It adds two transforms from the spine's transform-id table (`spec/LAYERS.md`):
 `gfa.allowable` is the one canonical allowable-GFA transform; TWA GFAAgent should point here.
 
 ```bash
-pip install -r rewire/requirements.txt   # sg-urban-spine@main + pinned upstream deps (python 3.10 / 3.11)
-# if github.com/tetratorus/sg-urban-spine is not readable for you, the same commit is at
-# git+https://github.com/tetratorus/saas-middleware@sg-urban-spine
+pip install -r rewire/requirements.txt   # git+https://github.com/tetratorus/saas-middleware@sg-urban-spine + pinned upstream deps (python 3.10 / 3.11)
 cd rewire
 spine --path . validate */transform.yaml
 spine --path . test                      # golden: both transforms
@@ -71,8 +69,13 @@ spine --lake LAKE --path . run gfa.allowable
 * Hub `plot_id = "mp19-" + lower(INC_CRC)` (URA MP2019 feature checksum), same convention as the
   spine's Jurong example. The KG splits a few MP2019 features into several CityObjects (slivers):
   the largest keeps `mp19-<inc_crc>`, the others get `-p2`, `-p3`… by area then IRI.
-* `id_bridge` rows: `twa_citieskg_plot` (KG CityObject IRI → plot, every plot) and
-  `ura_mp2019_inc_crc` (INC_CRC → primary plot), `lta_road_network` (`UNIQUE_ID` → `lta-rd-<UNIQUE_ID>`).
+* `id_bridge` rows (`hub` and `match_method` use the values `spec/silver/tables.yaml` documents):
+
+  | source | source_id | hub | match_method | how the key matches |
+  |---|---|---|---|---|
+  | `twa_citieskg_plot` | KG CityObject IRI (every plot) | `plot` | `exact` | via the KG's own INC_CRC attribute on the CityObject |
+  | `ura_mp2019_inc_crc` | MP2019 INC_CRC (primary plot only, no slivers) | `plot` | `exact` | `hub_id = "mp19-" + lower(INC_CRC)` |
+  | `lta_road_network` | LTA `UNIQUE_ID` | `road` | `exact` | `hub_id = "lta-rd-" + UNIQUE_ID` |
 * Upstream neighbour sets are stored as hub ids in `plots.neighbour` and mapped back to IRIs by the transform.
 
 `id_bridge` is shared by every source and `silver_write` replaces whole tables, so the conformer takes

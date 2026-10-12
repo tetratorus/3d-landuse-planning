@@ -25,8 +25,8 @@ def conform_roads(raw: gpd.GeoDataFrame, version: str):
         "source_version": version,
     }, geometry=raw.geometry.values, crs=kg_codec.SILVER_CRS)
     bridge = pd.DataFrame({
-        "source": ROAD_SOURCE, "source_id": raw["UNIQUE_ID"].astype(str).values, "hub": "roads",
-        "hub_id": road_id.values, "match_method": "exact_key", "confidence": 1.0, "source_version": version,
+        "source": ROAD_SOURCE, "source_id": raw["UNIQUE_ID"].astype(str).values, "hub": "road",
+        "hub_id": road_id.values, "match_method": "exact", "confidence": 1.0, "source_version": version,
     })
     return roads, bridge
 
