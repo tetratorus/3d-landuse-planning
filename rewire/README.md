@@ -7,7 +7,7 @@ It adds two transforms from the spine's transform-id table (`spec/LAYERS.md`):
 | id | kind | what it does |
 |---|---|---|
 | `ura.mp2019_conform` | conformer | Bronze 3DLUP planning KG extract + LTA roads → Silver `plots`, `zoning`, `regulations`, `roads`, `id_bridge` |
-| `gfa.allowable` | transform | Silver → Gold `allowable_gfa` (per `plot_id`) and `allowable_gfa_by_programme`, using the **unmodified** upstream regulation logic |
+| `gfa.allowable` | transform | Silver → Gold `allowable_gfa` (per `plot_id`), `allowable_gfa_by_programme`, `allowable_gfa_uncomputed`, using the **unmodified** upstream regulation logic |
 
 `gfa.allowable` is the one canonical allowable-GFA transform; TWA GFAAgent should point here.
 
@@ -34,7 +34,24 @@ Silver  plots · zoning · regulations · roads · id_bridge      (EPSG:3414)
    │  gfa.allowable: kg_codec.silver_to_frames -> retrievers_from_frames
    │                 -> upstream_harness.run_estimate_allowable_gfas -> UNMODIFIED main.estimate_allowable_gfas
    ▼
-Gold    allowable_gfa · allowable_gfa_by_programme
+Gold    allowable_gfa · allowable_gfa_by_programme · allowable_gfa_uncomputed
+```
+
+Gold layout: upstream returns a `{programme: gfa}` dict per plot. `allowable_gfa_by_programme` keeps
+every computed value; `allowable_gfa` is one row per plot (max over programmes, which programme, how
+many); `allowable_gfa_uncomputed` lists the (plot, programme) pairs where upstream emits NaN (spine
+Gold columns are non-null, so NaN is a row here rather than a null). Upstream's `None` programme key
+is written as `unspecified`.
+
+End to end through a spine lake (Bronze → conformer → transform → WAP audit → publish), on the
+1188-plot fixture, all plots: 862 plots with GFA, 1964 programme values, 27 uncomputed, ~15 s:
+
+```bash
+C=ura.mp2019_conform/golden/sg_44_plots/inputs
+spine --lake LAKE bronze-add --url https://doi.org/10.5281/zenodo.14646814 --license CC-BY-4.0 ura_mp2019_kg sg44-v1 $C/kg/*
+spine --lake LAKE bronze-add --url https://doi.org/10.5281/zenodo.14647555 --license "Singapore Open Data Licence v1.0" lta_road_network sg44-v1 $C/roads/*
+spine --lake LAKE --path . run ura.mp2019_conform
+spine --lake LAKE --path . run gfa.allowable
 ```
 
 * **upstream_harness.py** imports upstream `main.py` and, for one call, rebinds only I/O names in

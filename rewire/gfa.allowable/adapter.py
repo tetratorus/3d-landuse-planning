@@ -26,18 +26,19 @@ def flatten(result: pd.DataFrame, iri_to_id: dict[str, str]) -> dict[str, pd.Dat
         for programme, value in (gfa if isinstance(gfa, dict) else {}).items():
             v = None if value is None or (isinstance(value, float) and math.isnan(value)) else float(value)
             rows.append((iri_to_id[iri], NO_PROGRAMME if programme is None else str(programme), v))
-    by_prog = pd.DataFrame(rows, columns=["plot_id", "programme", "gfa_m2"])
-    by_prog["gfa_m2"] = by_prog["gfa_m2"].astype(float)
-    by_prog = by_prog.sort_values(["plot_id", "programme"], ignore_index=True)
+    allp = pd.DataFrame(rows, columns=["plot_id", "programme", "gfa_m2"])
+    allp["gfa_m2"] = allp["gfa_m2"].astype(float)
+    allp = allp.sort_values(["plot_id", "programme"], ignore_index=True)
+    by_prog = allp.dropna(subset=["gfa_m2"]).reset_index(drop=True)
+    uncomputed = allp[allp["gfa_m2"].isna()][["plot_id", "programme"]].reset_index(drop=True)
 
-    plot_ids = sorted(iri_to_id[i] for i in result["plots"])
-    valid = by_prog.dropna(subset=["gfa_m2"])
-    best = valid.sort_values(["gfa_m2", "programme"], ascending=[False, True]).drop_duplicates("plot_id")
-    per_plot = pd.DataFrame({"plot_id": plot_ids}).merge(
-        best.rename(columns={"programme": "max_gfa_programme", "gfa_m2": "max_gfa_m2"}), on="plot_id", how="left")
-    per_plot["n_programmes"] = per_plot["plot_id"].map(by_prog.groupby("plot_id").size()).fillna(0).astype(int)
+    best = by_prog.sort_values(["gfa_m2", "programme"], ascending=[False, True]).drop_duplicates("plot_id")
+    per_plot = best.rename(columns={"programme": "max_gfa_programme", "gfa_m2": "max_gfa_m2"})
+    per_plot = per_plot.sort_values("plot_id", ignore_index=True)
+    per_plot["n_programmes"] = per_plot["plot_id"].map(by_prog.groupby("plot_id").size()).astype(int)
     per_plot = per_plot[["plot_id", "max_gfa_m2", "max_gfa_programme", "n_programmes"]]
-    return {"allowable_gfa": per_plot, "allowable_gfa_by_programme": by_prog}
+    return {"allowable_gfa": per_plot, "allowable_gfa_by_programme": by_prog,
+            "allowable_gfa_uncomputed": uncomputed}
 
 
 def run(inputs, params):

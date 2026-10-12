@@ -40,15 +40,20 @@ outputs:
     key: [plot_id]
     columns:
       - {name: plot_id, type: string}
-      - {name: max_gfa_m2, type: float, unit: m2, description: "largest allowable GFA over the programmes upstream allows on the plot (null if none computable)"}
+      - {name: max_gfa_m2, type: float, unit: m2, description: "largest allowable GFA over the programmes upstream allows on the plot. Plots where upstream computes no value are absent here and listed in allowable_gfa_uncomputed"}
       - {name: max_gfa_programme, type: string, description: "programme giving max_gfa_m2 (upstream OntoBuildableSpace programme name)"}
-      - {name: n_programmes, type: int}
+      - {name: n_programmes, type: int, description: "programmes with a computed GFA"}
   - name: allowable_gfa_by_programme
     key: [plot_id, programme]
     columns:
       - {name: plot_id, type: string}
       - {name: programme, type: string, description: "upstream programme; 'unspecified' where upstream keys GFA by None"}
-      - {name: gfa_m2, type: float, unit: m2, description: "upstream gfa value (null where upstream emits NaN)"}
+      - {name: gfa_m2, type: float, unit: m2, description: "upstream gfa value"}
+  - name: allowable_gfa_uncomputed
+    key: [plot_id, programme]
+    columns:
+      - {name: plot_id, type: string}
+      - {name: programme, type: string, description: "programme for which upstream emitted NaN GFA (e.g. no buildable footprint)"}
 golden:
   - name: sg_44_plots
     path: golden/sg_44_plots
@@ -61,6 +66,7 @@ readiness:
     - "same 99 values as the unmodified upstream run against the full KG in Blazegraph (Linux) for the 36 shared plots"
     - "cross-check vs upstream's published Zenodo output: 106/115 programme values exact"
     - "runs on Linux without Blazegraph"
+    - "spine lake run Bronze -> ura.mp2019_conform -> gfa.allowable on all 1188 fixture plots passes the WAP audit (862 plots, 1964 values, ~15 s)"
   gaps:
     - "9 Flat values differ from the published Zenodo output; upstream run-to-run variance against Blazegraph observed on the same programmes (likely SPARQL row order, unconfirmed)"
     - "not run island-wide in this harness; full run ~10 min per 36 plots when the whole KG is in memory"
